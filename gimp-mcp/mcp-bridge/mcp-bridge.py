@@ -109,6 +109,20 @@ def _json_fallback(obj):
 # ---------------------------------------------------------------------------
 
 
+
+# Every image we (this bridge) open or create gets a display so it's
+# visible in the running GIMP instance. GIMP will not actually free an
+# image while it still has a display attached -- Gimp.Image.delete()
+# just returns False in that case, without raising. So we remember the
+# Display object each image got, and close *that* before ever trying to
+# delete the image itself. (Confirmed empirically: an image loaded
+# headless via Gimp.file_load with no attached display deletes fine
+# even when modified/dirty; an image with an attached display refuses
+# to delete even when completely unmodified -- the display, not the
+# dirty flag, is what blocks it.)
+_displays_by_image = {}
+
+
 def _get_image(image_id):
     if not Gimp.Image.id_is_valid(image_id):
         raise ValueError(f"No such image id: {image_id!r}")
@@ -202,7 +216,7 @@ def op_create_image(width, height, name=None, fill_white=True, **_kwargs):
     # via a virtual .xcf file path so get_name() reflects it too.
     if name:
         image.set_file(Gio.File.new_for_path(f"{name}.xcf"))
-    Gimp.Display.new(image)
+    _displays_by_image[image.get_id()] = Gimp.Display.new(image)
     Gimp.displays_flush()
     return _image_summary(image)
 
@@ -210,7 +224,7 @@ def op_create_image(width, height, name=None, fill_white=True, **_kwargs):
 def op_open_image(path, **_kwargs):
     file = Gio.File.new_for_path(path)
     image = Gimp.file_load(Gimp.RunMode.NONINTERACTIVE, file)
-    Gimp.Display.new(image)
+    _displays_by_image[image.get_id()] = Gimp.Display.new(image)
     Gimp.displays_flush()
     return _image_summary(image)
 
@@ -243,7 +257,24 @@ def op_export_image(image_id, path, **_kwargs):
 
 def op_delete_image(image_id, **_kwargs):
     image = _get_image(image_id)
-    image.delete()
+    disp = _displays_by_image.pop(int(image_id), None)
+    if disp is not None and disp.is_valid():
+        disp.delete()
+        Gimp.displays_flush()
+    # Closing an image's last display often destroys the image itself as
+    # a side effect (confirmed empirically: image.is_valid() goes False
+    # right after disp.delete() + displays_flush(), with no separate
+    # image.delete() call at all). So only call image.delete() -- and
+    # only trust *its* return value -- if the image is still around
+    # after we've closed its display; otherwise we'd be calling delete()
+    # on an already-gone image and wrongly reporting that as a failure.
+    if image.is_valid():
+        if not image.delete():
+            raise RuntimeError(
+                f"GIMP refused to delete image {image_id}: it still has an "
+                "attached display (or another live reference) keeping it open. "
+                "Close any remaining GIMP windows for this image and retry."
+            )
     return {"deleted": image_id}
 
 
@@ -339,10 +370,30 @@ def op_move_layer(image_id, layer_id, offset_x, offset_y, **_kwargs):
 
 
 def op_delete_layer(image_id, layer_id, **_kwargs):
-    _get_image(image_id)
+    image = _get_image(image_id)
     layer = _get_layer(layer_id)
-    layer.delete()
+    # Gimp.Item.delete() only works on items that are NOT attached to an
+    # image -- calling it directly on a live layer is a no-op that
+    # silently returns False, which is the actual root cause of the
+    # original "delete_layer doesn't delete" bug (confirmed empirically:
+    # layer.delete() on an attached layer returns False and the layer
+    # stays, in a plain headless image with no display involved at all --
+    # this is unrelated to the display-attachment issue that affected
+    # image deletion). The correct call is Gimp.Image.remove_layer(),
+    # which actually detaches (and frees) it.
+    if not image.remove_layer(layer):
+        raise RuntimeError(
+            f"GIMP refused to remove layer {layer_id} from image {image_id}."
+        )
     Gimp.displays_flush()
+    # Belt-and-braces: confirm it's actually gone rather than trusting
+    # the return value alone.
+    remaining_ids = [l.get_id() for l in image.get_layers()]
+    if layer_id in remaining_ids:
+        raise RuntimeError(
+            f"GIMP reported layer {layer_id} removed from image {image_id}, "
+            "but it's still present in image.get_layers()."
+        )
     return {"deleted": layer_id}
 
 
