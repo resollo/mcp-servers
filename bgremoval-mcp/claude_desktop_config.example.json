@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bgremoval": {
+      "command": "/ABSOLUTE/PATH/bgremoval-mcp/bgremoval_mcp_server/.venv/bin/python3",
+      "args": ["/ABSOLUTE/PATH/bgremoval-mcp/bgremoval_mcp_server/server.py"]
+    }
+  }
+}

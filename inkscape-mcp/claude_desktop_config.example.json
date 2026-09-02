@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "inkscape": {
+      "command": "/ABSOLUTE/PATH/inkscape-mcp/.venv/bin/python3",
+      "args": ["/ABSOLUTE/PATH/inkscape-mcp/server.py"],
+      "env": {
+        "INKSCAPE_BIN": "/Applications/Inkscape.app/Contents/MacOS/inkscape"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "inkscape": {
+      "command": "C:\\ABSOLUTE\\PATH\\inkscape-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\ABSOLUTE\\PATH\\inkscape-mcp\\server.py"],
+      "env": {
+        "INKSCAPE_BIN": "C:\\Program Files\\Inkscape\\bin\\inkscape.exe"
+      }
+    }
+  }
+}

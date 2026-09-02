@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gimp": {
+      "command": "/ABSOLUTE/PATH/gimp-mcp/gimp_mcp_server/.venv/bin/python3",
+      "args": ["/ABSOLUTE/PATH/gimp-mcp/gimp_mcp_server/server.py"]
+    }
+  }
+}
