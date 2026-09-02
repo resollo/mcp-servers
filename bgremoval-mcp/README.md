@@ -1,7 +1,5 @@
 # Background-removal MCP server (custom, extensible)
 
-![version](https://img.shields.io/badge/version-0.1.0-blue)
-
 This is a custom, local MCP server that lets an MCP-compatible AI app remove the
 background from an image using a local, offline AI segmentation model (**rembg**,
 ONNX Runtime) — no API key, no cloud, and after the first call (when the model is

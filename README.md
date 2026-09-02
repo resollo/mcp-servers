@@ -8,16 +8,16 @@ backgrounds with a local, offline AI segmentation model. No cloud APIs, no
 vendor lock-in — each server runs entirely on your machine and talks to its
 client over stdio/MCP.
 
-Each subfolder is a self-contained server — its own README, version, tests, and
+Each subfolder is a self-contained server — its own README, tests, and
 dependencies — and is usable on its own. They were developed and tested with
 Claude, but nothing is Claude-specific; each server's README shows how to
 register it with a client.
 
-| Server | Version | Description |
-| --- | --- | --- |
-| [`gimp-mcp`](gimp-mcp/) | 0.1.0 | Drive a running GIMP 3 instance from your AI app — open/export images, manage layers, run filters, run arbitrary PDB procedures or Python inside GIMP. |
-| [`inkscape-mcp`](inkscape-mcp/) | 0.1.0 | Create and edit SVG images as XML from your AI app, and export/convert them (PNG/PDF/…), text→path and path boolean ops via the Inkscape CLI. No running Inkscape window needed. |
-| [`bgremoval-mcp`](bgremoval-mcp/) | 0.1.0 | Remove an image background from your AI app with a local, offline AI segmentation model (rembg / ONNX Runtime). No API key, no cloud. |
+| Server | Description |
+| --- | --- |
+| [`gimp-mcp`](gimp-mcp/) | Drive a running GIMP 3 instance from your AI app — open/export images, manage layers, run filters, run arbitrary PDB procedures or Python inside GIMP. |
+| [`inkscape-mcp`](inkscape-mcp/) | Create and edit SVG images as XML from your AI app, and export/convert them (PNG/PDF/…), text→path and path boolean ops via the Inkscape CLI. No running Inkscape window needed. |
+| [`bgremoval-mcp`](bgremoval-mcp/) | Remove an image background from your AI app with a local, offline AI segmentation model (rembg / ONNX Runtime). No API key, no cloud. |
 
 ## Built for Resollo
 
@@ -31,5 +31,7 @@ for the full seller-facing walkthrough.
 
 ## Versioning
 
-Each server is versioned independently via a `VERSION` file in its folder and a
-badge in its README. Bump it on any user-visible change to that server.
+Each server is versioned independently via git tags — `<server>-vX.Y.Z` (e.g.
+`gimp-mcp-v0.1.0`) — with a matching [GitHub Release](../../releases) noting
+what changed. No version number is duplicated in-repo (no `VERSION` file, no
+README badge), so there is nothing to keep in sync by hand.

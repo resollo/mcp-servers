@@ -1,7 +1,5 @@
 # GIMP MCP server (custom, extensible)
 
-![version](https://img.shields.io/badge/version-0.1.0-blue)
-
 This is a custom, local MCP server that lets an MCP-compatible AI app directly
 drive a running **GIMP 3** instance: open/create/export images, manage layers,
 add text to an image, run GIMP filters/effects, and even run arbitrary Python
