@@ -118,6 +118,34 @@ background from photo X" → `bgremoval_remove_background(input_path, output_pat
 — the result is a transparent-background PNG, which e.g. GIMP can then composite
 onto a clean background.
 
+### A note on output image size (read this before compositing)
+
+The returned PNG is the **same pixel size as the input image** — the background
+is made transparent, but the canvas itself is not cropped to the product.
+
+If you're centering the product on a square canvas downstream, you must crop to
+the product's own bounding box first — otherwise the product ends up small and
+off-center in the final composite.
+
+**Finding the crop box is not as simple as "the bounding box of every
+non-transparent pixel."** Segmentation output can contain (a) faint sub-1% alpha
+noise near the image edges, and (b) small, high-confidence false-positive
+islands where background texture is misclassified as foreground. Both inflate a
+naive bounding box. The robust approach: take the bounding box of the
+**connected component** of non-transparent pixels that contains a point known to
+be inside the product (flood-fill / contiguous-select **on the alpha channel
+specifically**, not on color — color-based flood fill breaks on ordinary
+shading/highlights on the product surface).
+
+**Do not trust your cropping tool's output blindly, even if the output canvas
+size is correct.** In testing, a crop operation returned an image of the exact
+expected dimensions, but with the product's pixels shifted into one corner and
+most of the frame left empty — i.e. correct size, wrong content. Before
+compositing, sanity-check the crop: the fraction of non-transparent pixels in
+the cropped image should roughly match the fill fraction you measured for the
+bounding box itself, and a few sampled pixels (corners vs. center) should match
+the expected transparent/opaque pattern.
+
 ## Available tools
 
 - `bgremoval_ping`
