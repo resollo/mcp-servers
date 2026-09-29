@@ -111,9 +111,65 @@ def _apply_style(el: etree._Element, style: dict[str, Any] | None) -> None:
     el.set("style", ";".join(f"{k}:{v}" for k, v in current.items()))
 
 
+# Well-known prefixes, used when the document itself doesn't declare them.
+KNOWN_NAMESPACES = {"xlink": XLINK_NS}
+
+# Elements whose link must be written as xlink:href: the Inkscape CLI export
+# does not render a bare SVG2 `href` on these.
+XLINK_HREF_TAGS = {"image", "use"}
+
+
+def _attr_label(el: etree._Element, key: str) -> str:
+    """Human-readable attribute name: '{xlink-ns}href' -> 'xlink:href'.
+
+    Keeps namespaced attributes distinct from same-named plain ones, so a
+    stale `xlink:href` can't hide behind a plain `href` in tool output.
+    """
+    q = etree.QName(key)
+    if q.namespace is None:
+        return q.localname
+    prefix = next((p for p, ns in el.nsmap.items() if ns == q.namespace and p), None)
+    if prefix is None:
+        prefix = next((p for p, ns in KNOWN_NAMESPACES.items() if ns == q.namespace), None)
+    return f"{prefix}:{q.localname}" if prefix else key
+
+
+def _resolve_attr(el: etree._Element, name: str) -> str:
+    """Turn a user-supplied attribute name into the key lxml actually uses.
+
+    'xlink:href'  -> '{http://www.w3.org/1999/xlink}href'
+    'href' on <image>/<use> -> xlink:href as well (see XLINK_HREF_TAGS)
+    anything else -> unchanged
+    """
+    if name.startswith("{"):
+        return name
+    if ":" in name:
+        prefix, local = name.split(":", 1)
+        ns = el.nsmap.get(prefix) or KNOWN_NAMESPACES.get(prefix)
+        if ns is None:
+            raise ValueError(f"Unknown namespace prefix {prefix!r} in attribute {name!r}.")
+        return f"{{{ns}}}{local}"
+    if name == "href" and etree.QName(el).localname in XLINK_HREF_TAGS:
+        return f"{{{XLINK_NS}}}href"
+    return name
+
+
+def _ensure_ns_declared(root: etree._Element, namespace: str) -> None:
+    """Declare a well-known namespace (e.g. xlink) on the root if missing, so
+    lxml writes `xlink:href` instead of an auto-generated `ns0:href`. Keeps
+    every existing prefix, so nothing else in the file is touched."""
+    if namespace in root.nsmap.values():
+        return
+    prefix = next((p for p, ns in KNOWN_NAMESPACES.items() if ns == namespace), None)
+    if prefix is None:
+        return
+    existing = {p for el in root.iter() if isinstance(el.tag, str) for p in el.nsmap if p}
+    etree.cleanup_namespaces(root, top_nsmap={prefix: namespace}, keep_ns_prefixes=[*existing, prefix])
+
+
 def _element_summary(el: etree._Element) -> dict[str, Any]:
     tag = etree.QName(el).localname
-    attrs = {etree.QName(k).localname if isinstance(k, str) else k: v for k, v in el.attrib.items()}
+    attrs = {_attr_label(el, k) if isinstance(k, str) else k: v for k, v in el.attrib.items()}
     return {"id": attrs.get("id"), "tag": tag, "attributes": attrs}
 
 
@@ -479,15 +535,27 @@ def svg_add_group(path: str, element_id: str | None = None, parent_id: str | Non
 def svg_set_attributes(path: str, element_id: str, attributes: dict[str, Any]) -> dict:
     """Set arbitrary XML attributes on an element -- covers fill, stroke,
     transform, opacity, x/y/width/height/d, class, or anything else. Pass
-    a value of None for an attribute to remove it."""
+    a value of None for an attribute to remove it.
+
+    Namespaced names like 'xlink:href' work for both setting and removing.
+    On <image> and <use>, 'href' and 'xlink:href' are treated as the same
+    link and always written as xlink:href (the only form Inkscape's export
+    renders); any leftover plain `href` is removed so the two can't conflict."""
     tree, root = _load(path)
     el = _find_by_id(root, element_id)
+    xlink_href = f"{{{XLINK_NS}}}href"
+    is_link_el = etree.QName(el).localname in XLINK_HREF_TAGS
     for k, v in attributes.items():
+        key = _resolve_attr(el, k)
         if v is None:
-            if k in el.attrib:
-                del el.attrib[k]
+            el.attrib.pop(key, None)
         else:
-            el.set(k, str(v))
+            ns = etree.QName(key).namespace
+            if ns:
+                _ensure_ns_declared(root, ns)
+            el.set(key, str(v))
+        if is_link_el and key == xlink_href:
+            el.attrib.pop("href", None)
     _save(tree, path)
     return _element_summary(el)
 
