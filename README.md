@@ -29,6 +29,16 @@ drafts and creates the actual marketplace listing. See
 [resollo.com/guides/listing-photos](https://www.resollo.com/guides/listing-photos)
 for the full seller-facing walkthrough.
 
+## Agent skills
+
+The [`skills/`](skills/) folder has two ready-made [Agent Skills](https://agentskills.io)
+that teach an AI agent how to use these servers together with Resollo's MCP
+connector: [`resollo-selling`](skills/resollo-selling/) (photos → cleaned-up
+listing photos → draft listing, plus managing offers and orders) and
+[`resollo-buying`](skills/resollo-buying/) (search, seller checks, offers and
+orders, always with the user's explicit approval). Copy a skill folder into your
+agent's skills directory to use it.
+
 ## Versioning
 
 Each server is versioned independently via git tags — `<server>-vX.Y.Z` (e.g.
