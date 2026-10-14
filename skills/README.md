@@ -4,12 +4,12 @@
 
 | Skill | What it does |
 |---|---|
-| [`resollo-selling`](resollo-selling/SKILL.md) | Photos → cleaned-up product shots → inactive draft listing that Resollo's own AI fills in. Plus managing listings, offers and orders as a seller. |
+| [`resollo-selling`](resollo-selling/SKILL.md) | Photos picked in Resollo's photo picker → inactive draft listing that Resollo's own AI fills in, with optional local photo clean-up first. Plus managing listings, offers and orders as a seller. |
 | [`resollo-buying`](resollo-buying/SKILL.md) | Search across countries and currencies, check sellers and reviews, ask questions, negotiate, place orders, all with explicit user approval at every binding step. |
 
-Both skills run on Resollo's MCP server, `https://www.resollo.com/api/mcp`. Reading is open. Selling, offers and orders need a personal API key from your Resollo profile ("AI Agent Access"), sent as `Authorization: Bearer <key>`.
+Both skills run on Resollo's MCP server, `https://www.resollo.com/api/mcp`. Reading is open. Selling, offers and orders need the user's Resollo account: clients with connector sign-in (OAuth) ask them to sign in on first use; otherwise use a personal API key from the Resollo profile ("AI Agent Access"), sent as `Authorization: Bearer <key>`.
 
-The photo clean-up in `resollo-selling` uses the free local MCP servers in this repository: [`bgremoval-mcp`](../bgremoval-mcp/), [`gimp-mcp`](../gimp-mcp/) and [`inkscape-mcp`](../inkscape-mcp/).
+The optional photo clean-up in `resollo-selling` uses the free local MCP servers in this repository: [`bgremoval-mcp`](../bgremoval-mcp/), [`gimp-mcp`](../gimp-mcp/) and [`inkscape-mcp`](../inkscape-mcp/).
 
 ## Install
 

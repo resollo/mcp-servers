@@ -2,10 +2,10 @@
 name: resollo-buying
 description: Use this skill when the user wants to find, evaluate or buy an item on Resollo (resollo.com) - searching listings across countries and currencies, checking a seller's reputation and reviews, asking a seller a question, making or accepting a price offer, placing an order, tracking it, or getting the payment link. Also use it for shopping requests like "find me a used iPhone under 400 euros" when Resollo's MCP tools are connected, even if the user doesn't name Resollo. Every step that commits the user (an offer, an order) needs their explicit approval first; Resollo never processes payment itself. Not for listing items for sale (use resollo-selling).
 license: MIT
-compatibility: Search and reading work without an account through Resollo's MCP server (https://www.resollo.com/api/mcp). Questions, offers and orders need the buyer's personal API key.
+compatibility: Search and reading work without an account through Resollo's MCP server (https://www.resollo.com/api/mcp). Questions, offers and orders need the buyer's Resollo account: sign-in through the client's connector sign-in (OAuth), or a personal API key.
 metadata:
   author: resollo
-  version: "1.0"
+  version: "1.1"
 ---
 
 # Buying on Resollo
@@ -19,12 +19,14 @@ Resollo is an international marketplace for second-hand and new items (8 languag
 - **You never pay.** Resollo does not process payments. Buyer and seller settle directly (cash, bank transfer, PayPal, or card via Stripe). For card payment, `orders.checkoutLink` returns a Stripe URL that the user opens and pays themselves.
 - **Addresses:** only the user's own saved addresses (`address_key`), or `personal` hand-over. Never type in a free-text address.
 - **Public posts:** `questions.ask` posts a public question on the listing. Show the user the exact text and get approval first.
-- **Protect the API key.** Never print or repeat it.
+- **Protect the API key**, if the user uses one. Never print or repeat it.
 
 ## Setup
 
 - Reading (search, details, sellers, reviews, Q&A) works without an account.
-- For questions, offers and orders: the user creates a personal API key on their Resollo profile page ("AI Agent Access") and adds Resollo as a remote MCP server: `https://www.resollo.com/api/mcp` with header `Authorization: Bearer <key>`.
+- Add Resollo as a remote MCP server (connector): `https://www.resollo.com/api/mcp`.
+- For questions, offers and orders: clients with connector sign-in (Claude, ChatGPT and others) ask the user to sign in, or sign up, the first time a tool needs their account.
+- Only if the client can't sign in to connectors: the user creates a personal API key on their Resollo profile page ("AI Agent Access"), and the server is added with the header `Authorization: Bearer <key>`.
 
 ## Workflow
 

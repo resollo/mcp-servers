@@ -29,6 +29,8 @@ Work on copies. Never overwrite the user's original photos.
 
 6. **Look at the result** before uploading: the whole item visible, not cut off, centred, not tiny in the frame, colours natural.
 
+7. **Hand the files over**: save the finished photos in a folder the user can open (not a hidden scratch folder) and tell them the path. They select these files themselves in Resollo's photo picker; you can't attach them to `products.create`.
+
 ## Housekeeping
 
 - Close images you opened in GIMP when done (`gimp_delete_image`). Many open images in one session have caused mix-ups between image ids.
