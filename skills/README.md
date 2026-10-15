@@ -4,7 +4,7 @@
 
 | Skill | What it does |
 |---|---|
-| [`resollo-selling`](resollo-selling/SKILL.md) | Photos picked in Resollo's photo picker → inactive draft listing that Resollo's own AI fills in, with optional local photo clean-up first. Plus managing listings, offers and orders as a seller. |
+| [`resollo-selling`](resollo-selling/SKILL.md) | Photos uploaded directly by the agent (converted to WebP) or picked in Resollo's photo picker → inactive draft listing that Resollo's own AI fills in, with optional local photo clean-up first. Plus managing listings, offers and orders as a seller. |
 | [`resollo-buying`](resollo-buying/SKILL.md) | Search across countries and currencies, check sellers and reviews, ask questions, negotiate, place orders, all with explicit user approval at every binding step. |
 
 Both skills run on Resollo's MCP server, `https://www.resollo.com/api/mcp`. Reading is open. Selling, offers and orders need the user's Resollo account: clients with connector sign-in (OAuth) ask them to sign in on first use; otherwise use a personal API key from the Resollo profile ("AI Agent Access"), sent as `Authorization: Bearer <key>`.

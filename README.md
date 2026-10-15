@@ -18,6 +18,7 @@ register it with a client.
 | [`gimp-mcp`](gimp-mcp/) | Drive a running GIMP 3 instance from your AI app — open/export images, manage layers, run filters, run arbitrary PDB procedures or Python inside GIMP. |
 | [`inkscape-mcp`](inkscape-mcp/) | Create and edit SVG images as XML from your AI app, and export/convert them (PNG/PDF/…), text→path and path boolean ops via the Inkscape CLI. No running Inkscape window needed. |
 | [`bgremoval-mcp`](bgremoval-mcp/) | Remove an image background from your AI app with a local, offline AI segmentation model (rembg / ONNX Runtime). No API key, no cloud. |
+| [`resollo-upload-mcp`](resollo-upload-mcp/) | Upload finished WebP listing photos to Resollo's direct upload from your AI app — one narrow tool that only sends `.webp` files to Resollo signed upload URLs. |
 
 ## Built for Resollo
 

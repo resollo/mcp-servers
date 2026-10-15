@@ -29,7 +29,7 @@ Work on copies. Never overwrite the user's original photos.
 
 6. **Look at the result** before uploading: the whole item visible, not cut off, centred, not tiny in the frame, colours natural.
 
-7. **Hand the files over**: save the finished photos in a folder the user can open (not a hidden scratch folder) and tell them the path. They select these files themselves in Resollo's photo picker; you can't attach them to `products.create`.
+7. **Hand the files over**: if you can upload directly (SKILL.md step 3, path A), export the finished photos as WebP within `direct_upload.requirements` and upload them yourself. Otherwise save them in a folder the user can open (not a hidden scratch folder), tell them the path, and let them select the files in Resollo's photo picker.
 
 ## Housekeeping
 
