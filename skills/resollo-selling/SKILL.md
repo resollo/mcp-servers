@@ -49,7 +49,7 @@ Only if the user wants it and the photo tools are available: run the clean-up in
 
 ### 3. Get the photos in
 
-Decide the path first, then call `products.create`. It returns `upload_url`, `max_images`, `upload_id` and `direct_upload` (`put_urls`, `headers`, `requirements`, `expires_in_seconds`). In clients that support MCP Apps it also shows the photo picker, unless you pass `upload: "direct"`.
+Decide the path first, then call `products.create`. It always returns `upload_url` and `max_images`. With `upload: "direct"` it also returns `upload_id` and `direct_upload` (`put_urls`, `headers`, `requirements`, `expires_in_seconds`) and the photo picker stays hidden; without it, clients that support MCP Apps show the photo picker.
 
 **A. Direct upload** — when you have a tool that can produce the WebP files from the seller's photos, and a way to send an HTTP PUT. Call `products.create` with `upload: "direct"`, so the panel doesn't offer the seller the picker as a second way:
 
