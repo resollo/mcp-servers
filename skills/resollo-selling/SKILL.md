@@ -2,7 +2,7 @@
 name: resollo-selling
 description: Use this skill when the user wants to sell an item on Resollo (resollo.com) or manage what they already sell there - turning phone photos of an item into a Resollo listing, cleaning up product photos before listing, finding out why a listing can't be created, finding draft or inactive listings, and handling incoming offers or orders as a seller. Also use it when the user simply wants to sell something second-hand online and Resollo's MCP tools are connected, even if they don't name Resollo. Works through Resollo's MCP server and, optionally, the free local GIMP, Inkscape and background-removal MCP servers from github.com/resollo/mcp-servers. Not for buying on Resollo (use resollo-buying).
 license: MIT
-compatibility: Needs Resollo's remote MCP server (https://www.resollo.com/api/mcp); the seller signs in through the client's connector sign-in (OAuth) or uses a personal API key. Uploading photos yourself needs a tool that can produce the WebP files (e.g. the free photo MCP servers from github.com/resollo/mcp-servers, ImageMagick or cwebp) and a way to send an HTTP PUT (the resollo-upload MCP server from the same repository, or a shell with curl); otherwise the seller uses Resollo's photo picker. Optional photo clean-up needs the local resollo/mcp-servers photo tools.
+compatibility: Needs Resollo's remote MCP server (https://www.resollo.com/api/mcp), signed in via the client's connector sign-in (OAuth) or a personal API key. Uploading photos yourself needs a tool that creates WebP files (e.g. the photo MCP servers from github.com/resollo/mcp-servers, ImageMagick, cwebp) and a way to send an HTTP PUT; otherwise the seller uses Resollo's photo picker.
 metadata:
   author: resollo
   version: "2.1"
