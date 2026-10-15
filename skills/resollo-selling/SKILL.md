@@ -15,7 +15,7 @@ Resollo is an international second-hand and new-goods marketplace (8 languages, 
 ## Ground rules
 
 - **Never publish on the seller's behalf.** `products.create` always creates an **inactive** draft. Only the seller activates it on resollo.com. Never tell the user the item is live.
-- **Never put photo bytes into a tool argument** (no base64). Photos go in through the photo picker or a direct upload (step 3). Photos pasted into the conversation can't be forwarded to Resollo; if the user pasted one, explain that and let them pick the file in the photo picker, or ask for the file on disk if you can upload directly.
+- **Never put photo bytes into a tool argument** (no base64). Photos go in through the photo picker or a direct upload (step 3). A photo that arrives as a file — attached, or a file pasted from the seller's file manager (it shows up as a file card with its name) — reaches your tools as that file and can go through a direct upload. Only an inline image (a screenshot, or an image copied from a browser) is just pixels you can see, not a file: it can't be forwarded or rebuilt, so for that one use the photo picker.
 - **Resollo never converts photos.** For a direct upload you convert them yourself; if you can't, use the photo picker.
 - **Never fill in Resollo's web listing form** with a browser or any other automation. Resollo's AI & Automation Policy forbids third-party AI form-filling; `products.create` is the permitted path.
 - **Don't write the listing text yourself.** Title, description, category, condition and price all come from Resollo's AI; the seller edits them on resollo.com before activating.
@@ -49,12 +49,12 @@ Only if the user wants it and the photo tools are available: run the clean-up in
 
 ### 3. Get the photos in
 
-Call `products.create` (no arguments). It returns `upload_url`, `max_images`, `upload_id` and `direct_upload` (`put_urls`, `headers`, `requirements`, `expires_in_seconds`), and in clients that support MCP Apps it also shows the photo picker. Then take one path:
+Decide the path first, then call `products.create`. It returns `upload_url`, `max_images`, `upload_id` and `direct_upload` (`put_urls`, `headers`, `requirements`, `expires_in_seconds`). In clients that support MCP Apps it also shows the photo picker, unless you pass `upload: "direct"`.
 
-**A. Direct upload** — when you have a tool that can produce the WebP files from the seller's photos, and a way to send an HTTP PUT:
+**A. Direct upload** — when you have a tool that can produce the WebP files from the seller's photos, and a way to send an HTTP PUT. Call `products.create` with `upload: "direct"`, so the panel doesn't offer the seller the picker as a second way:
 
 1. Create each photo (1 to `max_images`, the first one is the cover) as a WebP file within `direct_upload.requirements`: at most 1024 px on its longest side, metadata stripped, under `max_bytes`. A square crop matches how Resollo shows listing photos. Any tool that writes such a file works:
-   - **The photo MCP servers in [resollo/mcp-servers](https://github.com/resollo/mcp-servers):** after the clean-up in [references/photo-prep.md](references/photo-prep.md) (or just open + resize in GIMP), `gimp_export_image` to a `.webp` path.
+   - **The photo MCP servers in [resollo/mcp-servers](https://github.com/resollo/mcp-servers):** after the clean-up in [references/photo-prep.md](references/photo-prep.md) (or just open + resize in GIMP), `gimp_export_image` to a `.webp` path. GIMP keeps the photo's EXIF data (which can include the GPS location) in the exported file, and Resollo rejects a WebP that still has EXIF/XMP: strip it before uploading (e.g. `magick 0.webp -strip 0.webp`, or remove the image's metadata in GIMP before exporting).
    - **ImageMagick or cwebp** from a shell:
    ```bash
    # ImageMagick (also reads HEIC on most builds); -auto-orient before -strip keeps the photo upright
@@ -73,7 +73,7 @@ Call `products.create` (no arguments). It returns `upload_url`, `max_images`, `u
 
 The URLs expire after `expires_in_seconds` (2 hours); if they did, call `products.create` again. A photo that isn't WebP within the requirements is rejected (`invalid_image`) and never converted: the failed attempt discards the uploaded files, so fix the file, upload all photos again to the same URLs (or open a new upload), and call `products.createFromUpload` again.
 
-**B. Photo picker** — otherwise:
+**B. Photo picker** — otherwise call `products.create` without arguments:
 
 - **Clients that support MCP Apps** (e.g. Claude, ChatGPT) show Resollo's photo picker right in the chat. The seller picks 1 to `max_images` photos (the first is the cover) and presses the upload button. Their browser resizes the photos and strips metadata such as GPS location; HEIC works too.
 - **Otherwise** give the seller the returned `upload_url`: a resollo.com page with the same picker (signed in; phone gallery or camera works).
