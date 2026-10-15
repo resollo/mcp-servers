@@ -82,7 +82,7 @@ Either way, Resollo's AI then drafts the listing. Each draft uses 2 AI credits (
 
 ### 4. Hand over to the seller
 
-After a direct upload, `products.createFromUpload` already returned the draft. After the in-chat picker, you learn the draft's `product_id`, title and activation link with the user's next message. With the `upload_url` page, wait until the user says they uploaded, then find the draft with `sellers.listings` (`state: "inactive"`). Tell the seller clearly:
+After a direct upload, `products.createFromUpload` already returned the draft. After the photo picker (in the chat or via `upload_url`), the panel shows the seller the result, but you don't reliably get the draft's id: wait until the user says they uploaded, then find the draft with `sellers.listings` (`state: "inactive"`, the newest one; its `edit_url` is the activation link). Tell the seller clearly:
 
 - the listing is a **draft and not visible yet**;
 - they should review it (title, description, price) and activate it at the activation link;
