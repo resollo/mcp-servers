@@ -5,7 +5,7 @@ license: MIT
 compatibility: Needs Resollo's remote MCP server (https://www.resollo.com/api/mcp), signed in via the client's connector sign-in (OAuth) or a personal API key. Uploading photos yourself needs a tool that creates WebP files (e.g. the photo MCP servers from github.com/resollo/mcp-servers, ImageMagick, cwebp) and a way to send an HTTP PUT; otherwise the seller uses Resollo's photo picker.
 metadata:
   author: resollo
-  version: "2.1"
+  version: "2.2"
 ---
 
 # Selling on Resollo
@@ -82,7 +82,7 @@ Either way, Resollo's AI then drafts the listing. Each draft uses 2 AI credits (
 
 ### 4. Hand over to the seller
 
-After a direct upload, `products.createFromUpload` already returned the draft. After the photo picker (in the chat or via `upload_url`), the panel shows the seller the result, but you don't reliably get the draft's id: wait until the user says they uploaded, then find the draft with `sellers.listings` (`state: "inactive"`, the newest one; its `edit_url` is the activation link). Tell the seller clearly:
+After a direct upload, `products.createFromUpload` already returned the draft. After the photo picker (in the chat or via `upload_url`), the picker itself shows the seller the draft and its activation link, so you don't need to look it up or wait for it. If you need the draft's details later, it's the newest `inactive` listing in `sellers.listings` (its `edit_url` is the activation link). Tell the seller clearly:
 
 - the listing is a **draft and not visible yet**;
 - they should review it (title, description, price) and activate it at the activation link;
